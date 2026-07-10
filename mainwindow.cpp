@@ -149,6 +149,15 @@ void MainWindow::initUI()
 
     // 状态栏
     statusBar()->showMessage("按方向键控制方块，按 P 暂停/继续");
+    // ---------- 在 initUI() 末尾添加 ----------
+    // 禁止按钮获取焦点，防止空格误触
+    m_startBtn->setFocusPolicy(Qt::NoFocus);
+    m_pauseBtn->setFocusPolicy(Qt::NoFocus);
+    m_resetBtn->setFocusPolicy(Qt::NoFocus);
+
+    // 让游戏画布能够接收焦点，并主动获取焦点
+    m_gameWidget->setFocusPolicy(Qt::StrongFocus);
+    m_gameWidget->setFocus();
 }
 
 // ---------- 创建菜单栏 ----------
@@ -347,6 +356,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Space:
         m_controller->hardDrop();
         break;
+        return;
     case Qt::Key_P:
     case Qt::Key_Escape:
         if (m_controller->getState() == Playing) {
