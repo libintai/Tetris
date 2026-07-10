@@ -207,26 +207,37 @@ int GameModel::performClearRows()
 
     int cleared = m_pendingClearRows.size();
 
-    // 从下往上排序（确保从底部开始消除）
-    std::sort(m_pendingClearRows.begin(), m_pendingClearRows.end(), std::greater<int>());
-
+    // 1. 标记要删除的行
+    bool rowsToDelete[ROWS] = {false};
     for (int row : m_pendingClearRows) {
-        // 将该行上面的所有行下移
-        for (int r = row; r > 0; r--) {
-            for (int c = 0; c < COLS; c++) {
-                m_board[r][c] = m_board[r - 1][c];
-            }
+        if (row >= 0 && row < ROWS) {
+            rowsToDelete[row] = true;
         }
-        // 顶部行置空
+    }
+
+    // 2. 批量删除：将非满行下移到底部
+    int writeRow = ROWS - 1;
+    for (int readRow = ROWS - 1; readRow >= 0; readRow--) {
+        if (!rowsToDelete[readRow]) {
+            // 复制整行
+            for (int c = 0; c < COLS; c++) {
+                m_board[writeRow][c] = m_board[readRow][c];
+            }
+            writeRow--;
+        }
+    }
+
+    // 3. 顶部剩余行置空
+    for (int row = writeRow; row >= 0; row--) {
         for (int c = 0; c < COLS; c++) {
-            m_board[0][c] = 0;
+            m_board[row][c] = 0;
         }
     }
 
     // 清空待消除列表
     m_pendingClearRows.clear();
 
-    // 计分
+    // 4. 计分
     int scoreTable[] = {0, 100, 300, 500, 800};
     int addScore = (cleared <= 4) ? scoreTable[cleared] : 800;
     m_score += addScore;
@@ -234,15 +245,11 @@ int GameModel::performClearRows()
     m_level = m_lines / 10 + 1;
     updateSpeed();
 
-    // 发射信号更新界面
     emit scoreChanged(m_score);
     emit linesChanged(m_lines);
     emit levelChanged(m_level);
 
-    qDebug() << "🎯 消除" << cleared << "行！得分 +" << addScore
-             << "，总得分：" << m_score << "，等级：" << m_level;
-
-    // 生成下一个方块
+    // 5. 生成下一个方块
     generateNewBlock();
     if (checkCollision(m_currentBlock)) {
         m_gameOver = true;
