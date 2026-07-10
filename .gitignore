@@ -1,0 +1,34 @@
+# 忽略构建目录（最重要）
+build/
+*build*/
+
+# 忽略 CMake 生成文件
+CMakeLists.txt.user
+CMakeLists.txt.user.*
+*.cmake
+CMakeCache.txt
+CMakeFiles/
+
+# 忽略 Qt 编译生成的临时文件
+*.o
+*.so
+*.a
+*.exe
+*.dll
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+*.moc
+*.pdb
+*.ilk
+
+# 忽略 Qt Creator 用户配置
+*.user
+*.creator.user
+*.autosave
+
+# 忽略 IDE 临时文件
+*.swp
+*.swo
+*~
+.DS_Store
