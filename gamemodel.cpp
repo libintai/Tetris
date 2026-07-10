@@ -96,6 +96,10 @@ bool GameModel::moveCurrentBlock(int dx, int dy)
 // ---------- 旋转当前方块（含踢墙处理）----------
 bool GameModel::rotateCurrentBlock()
 {
+    if (m_currentBlock.getType() == O) {
+        return false;
+    }
+
     if (m_gameOver) return false;
 
     Tetromino temp = m_currentBlock;
